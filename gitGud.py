@@ -1,50 +1,98 @@
 import getopt
+import os
+import subprocess
 import sys
 
 import config
-
-__version__ = config.VERSION
-
-tidy = False
-dryrun = False
-checkout = False
-override = False
-sync = True
+import constants
 
 
-def writeHelp():
+def writeHelp() -> None:
     """Write the help text to the console."""
     print(
         "Usage: gitGud.py [ -t, --tidy ] [ -d, --dryrun ] [ -c, --checkout ]",
         "Running without any arguments will sync core, skins",
         "and extensions without any tidying or checking out.",
         "==========",
-        f"{config.GITHUB}",
+        f"{constants.GITHUB}",
         sep="\n",
     )
 
 
-def writeSettingLine():
+def writeSettingLine() -> None:
     """Write the settings line to the console."""
-    if tidy:
+    if config.tidy:
         print("[tidy] ", end="")
 
-    if dryrun:
+    if config.dryrun:
         print("[dryrun] ", end="")
 
-    if checkout:
+    if config.checkout:
         print("[checkout] ", end="")
 
-    if sync:
+    if config.sync:
         print("[sync]")
 
     print("==========")
 
 
+def git(cmd: str, dir: str, dev: bool) -> None:
+    """Git commands."""
+    if cmd == "pull":
+        command = ["git", "-C", f"{dir}", "pull", "-q"]
+    else:
+        print(f"Unknown command: {cmd}")
+        sys.exit(2)
+
+    if config.dryrun:
+        print(f"[dry] Would have run git {cmd} in {dir}")
+    else:
+        print(f"[git] Running git {cmd}")
+        try:
+            p = subprocess.Popen(command, cwd=dir)
+            p.wait()
+            print(f"[git] Finished running git {cmd}")
+        except Exception as e:
+            print(e)
+            sys.exit(2)
+
+
+def doWork(name: str, type: str) -> None:
+    """Do work on the given extension/skin"""
+    devExt = False
+    # Get the type
+    if type == "extension":
+        print(f"[ext:{name}]")
+        extDir = f"{constants.EXT_DIR}{name}"
+        print(f"[dir] {extDir}")
+    elif type == "skin":
+        print(f"[skin:{name}]")
+        extDir = f"{constants.SKIN_DIR}{name}"
+        print(f"[dir] {extDir}")
+    elif type == "core":
+        pass
+    else:
+        print(f"Unknown type: {type}")
+        sys.exit(2)
+
+    # Check if it's included in the development list
+    if name in constants.IN_DEVELOPMENT:
+        print("[dev] Marked as in development")
+        devExt = True
+
+    git("pull", extDir, devExt)
+    print()
+
+
+def walkDir(directory: str, type: str) -> None:
+    for name in os.listdir(directory):
+        if os.path.isdir(f"{directory}{name}"):
+            doWork(name, type)
+
+
 def main(argv):
     """Main function."""
-    global tidy, dryrun, checkout, sync
-    print(f"gitGud v{__version__}", "==========", sep="\n")
+    print(f"gitGud v{constants.VERSION}", "==========", sep="\n")
 
     try:
         opts, args = getopt.getopt(argv, "htdc", ["help", "tidy", "dryrun", "checkout"])
@@ -55,13 +103,15 @@ def main(argv):
             writeHelp()
             sys.exit()
         elif opt in ("-t", "--tidy"):
-            tidy = True
+            config.tidy = True
         elif opt in ("-d", "--dryrun"):
-            dryrun = True
+            config.dryrun = True
         elif opt in ("-c", "--checkout"):
-            checkout = True
+            config.checkout = True
 
     writeSettingLine()
+    walkDir(constants.EXT_DIR, "extension")
+    walkDir(constants.SKIN_DIR, "skin")
 
 
 if __name__ == "__main__":
