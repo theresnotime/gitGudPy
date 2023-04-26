@@ -1,5 +1,7 @@
-tidy = False
+# Defaults
 dryrun = False
+pull = True
+fetch = False
 checkout = False
-override = False
-sync = True
+stash = False
+tidy = False
