@@ -14,5 +14,5 @@ IN_DEVELOPMENT = env.list("IN_DEVELOPMENT")
 
 # Directory config
 MW_DIR = typing.cast(str, env.str("MW_DIR"))
-EXT_DIR = typing.cast(str, f"{MW_DIR}extensions\\")
-SKIN_DIR = typing.cast(str, f"{MW_DIR}skins\\")
+EXT_DIR = typing.cast(str, f"{MW_DIR}extensions")
+SKIN_DIR = typing.cast(str, f"{MW_DIR}skins")

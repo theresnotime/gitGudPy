@@ -74,7 +74,7 @@ def git(cmd: str, dir: str, dev: bool) -> None:
     if cmd == "pull":
         command = ["git", "-C", f"{dir}", "pull", "-q"]
     elif cmd == "fetch":
-        command = ["git", "-C", f"{dir}", "fetch", "--all", "-q"]
+        command = ["git", "-C", f"{dir}", "fetch", "--prune"]
     elif cmd == "stash":
         command = [
             "git",
@@ -114,11 +114,11 @@ def doWork(name: str, type: str) -> None:
     # Get the type
     if type == "extension":
         print(f"[ext:{name}]")
-        extDir = f"{constants.EXT_DIR}{name}"
+        extDir = f"{constants.EXT_DIR}/{name}"
         print(f"[dir] {extDir}")
     elif type == "skin":
         print(f"[skin:{name}]")
-        extDir = f"{constants.SKIN_DIR}{name}"
+        extDir = f"{constants.SKIN_DIR}/{name}"
         print(f"[dir] {extDir}")
     elif type == "core":
         print("[core]")
@@ -148,7 +148,7 @@ def doWork(name: str, type: str) -> None:
 
 def walkDir(directory: str, type: str) -> None:
     for name in os.listdir(directory):
-        if os.path.isdir(f"{directory}{name}"):
+        if os.path.isdir(f"{directory}/{name}"):
             doWork(name, type)
 
 
