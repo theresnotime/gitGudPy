@@ -6,7 +6,7 @@ env = Env()
 env.read_env()
 
 # Meta
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 GITHUB = "https://github.com/theresnotime/gitGudPy"
 
 # Development repos

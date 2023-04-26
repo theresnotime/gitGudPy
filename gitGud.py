@@ -198,7 +198,7 @@ def main(argv):
         action="store_true",
     )
     parser.add_argument(
-        "--pull", default=config.pull, help="Pull changes", action="store_true"
+        "--nopull", default=False, help="Don't pull changes", action="store_true"
     )
     parser.add_argument(
         "--debug", default=False, help="Debug stuff", action="store_true"
@@ -210,7 +210,7 @@ def main(argv):
     config.dryrun = args.dryrun
     config.checkout = args.checkout
     config.fetch = args.fetch
-    config.pull = args.pull
+    config.pull = not args.nopull
     config.stash = args.stash
 
     writeSettingLine()
